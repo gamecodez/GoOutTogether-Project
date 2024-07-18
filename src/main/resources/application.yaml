@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: goout-backend
+    # threads.virtual.enabled: true
+    threads:
+        virtual:
+            enabled: true
+
+

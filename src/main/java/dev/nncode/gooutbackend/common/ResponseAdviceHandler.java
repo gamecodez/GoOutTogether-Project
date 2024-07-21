@@ -26,21 +26,21 @@ public class ResponseAdviceHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        var text = "Invalid argument request";
+        var text = "Invalid arguments request";
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, text);
         Map<String, Object> properties = new HashMap<>();
         var invalidArgumentList = e.getBindingResult().getFieldErrors();
         for (var oe : invalidArgumentList) {
             properties.put(oe.getField(), oe.getDefaultMessage());
         }
-        detail.setProperties(properties);
+        detail.setProperty("arguments", properties);
         return ResponseEntity.badRequest().body(detail);
     }
 
     @ExceptionHandler(EntityNotFound.class)
     protected ResponseEntity<Object> globalExceptionHandling(EntityNotFound e) {
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.NOT_FOUND,
                 e.getMessage());
         logger.info("Entity not found: {}", detail);
         return ResponseEntity.notFound().build();

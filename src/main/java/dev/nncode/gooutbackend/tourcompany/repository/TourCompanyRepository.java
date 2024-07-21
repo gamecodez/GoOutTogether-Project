@@ -1,4 +1,4 @@
-package dev.nncode.gooutbackend.tourcompany;
+package dev.nncode.gooutbackend.tourcompany.repository;
 
 import org.springframework.data.repository.CrudRepository;
 

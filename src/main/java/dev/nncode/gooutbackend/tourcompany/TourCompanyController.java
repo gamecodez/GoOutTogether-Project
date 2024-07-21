@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.nncode.gooutbackend.tourcompany.dto.RegisterTourCompanyDto;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
-import dev.nncode.gooutbackend.tourcompany.model.TourCompanyDto;
 
 
 @RestController
@@ -26,7 +26,7 @@ public class TourCompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<TourCompany> registerNewTourCompany(@RequestBody @Validated TourCompanyDto body) {
+    public ResponseEntity<TourCompany> registerNewTourCompany(@RequestBody @Validated RegisterTourCompanyDto body) {
         var tourCompany = tourCompanyService.registerTourCompany(body);       
         return ResponseEntity.ok(tourCompany);
     }

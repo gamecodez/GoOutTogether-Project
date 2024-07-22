@@ -1,10 +1,11 @@
 package dev.nncode.gooutbackend;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class GooutBackendApplicationTests {
+import dev.nncode.gooutbackend.config.AbstractIntegrationTest;
+
+
+class GooutBackendApplicationTests extends AbstractIntegrationTest {
 
 	@Test
 	void contextLoads() {

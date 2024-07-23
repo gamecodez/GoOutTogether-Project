@@ -2,7 +2,6 @@ package dev.nncode.gooutbackend.tour;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import dev.nncode.gooutbackend.tour.dto.TourDto;
 import dev.nncode.gooutbackend.tour.model.Tour;

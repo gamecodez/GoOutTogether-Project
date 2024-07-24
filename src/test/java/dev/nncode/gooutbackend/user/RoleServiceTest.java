@@ -12,9 +12,12 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import dev.nncode.gooutbackend.common.enumeration.RoleEnum;
+import dev.nncode.gooutbackend.user.model.Role;
+import dev.nncode.gooutbackend.user.repository.RoleRepository;
+import dev.nncode.gooutbackend.user.service.RoleService;
 
 @ExtendWith(MockitoExtension.class)
-public class RoleServiceTest {
+class RoleServiceTest {
 
     @InjectMocks
     private RoleService roleService;

@@ -1,4 +1,4 @@
-package dev.nncode.gooutbackend.user;
+package dev.nncode.gooutbackend.user.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;

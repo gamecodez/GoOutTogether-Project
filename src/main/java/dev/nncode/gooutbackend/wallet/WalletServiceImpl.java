@@ -25,7 +25,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public UserWallet createConsumerWalltet(int userId) {
+    public UserWallet createConsumerWallet(int userId) {
         AggregateReference<User, Integer> userReference = AggregateReference.to(userId);
         Instant currentTimestamp = Instant.now();
         BigDecimal initBalance = new BigDecimal("0.00");

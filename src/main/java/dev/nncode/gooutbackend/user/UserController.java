@@ -6,20 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import dev.nncode.gooutbackend.user.dto.UserCreationDto;
-import dev.nncode.gooutbackend.user.dto.UserInfoDto;
-import dev.nncode.gooutbackend.user.service.UserService;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import dev.nncode.gooutbackend.user.dto.UserCreationDto;
+import dev.nncode.gooutbackend.user.dto.UserInfoDto;
 import dev.nncode.gooutbackend.user.dto.UserUpdateDto;
+import dev.nncode.gooutbackend.user.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -57,7 +55,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteUser(@PathVariable Integer id) {
-        userService.deleteUser(id);
+        userService.deleteUserById(id);
         logger.info("UserId: {} has been deleted", id);
         return ResponseEntity.ok(true);
     }

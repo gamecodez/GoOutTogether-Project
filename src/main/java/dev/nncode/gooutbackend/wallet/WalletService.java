@@ -4,7 +4,7 @@ import dev.nncode.gooutbackend.wallet.model.UserWallet;
 
 public interface WalletService {
 
-    UserWallet createConsumerWalltet(int userId);
+    UserWallet createConsumerWallet(int userId);
 
     void deleteConsumerWalletByUserId(int userId);
 

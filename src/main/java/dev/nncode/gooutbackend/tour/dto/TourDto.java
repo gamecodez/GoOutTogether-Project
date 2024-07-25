@@ -2,9 +2,6 @@ package dev.nncode.gooutbackend.tour.dto;
 
 import java.time.Instant;
 
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
-
-import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

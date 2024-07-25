@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.nncode.gooutbackend.common.enumeration.TourCompanyStatus;
-import dev.nncode.gooutbackend.common.exception.EntityNotFound;
+import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.tourcompany.dto.RegisterTourCompanyDto;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompanyLogin;
@@ -53,7 +53,7 @@ public class TourCompanyServiceImpl implements TourCompanyService {
     @Transactional
     public TourCompany approvedTourCompany(Integer id) {
         var tourCompany = tourCompanyRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFound(String.format("Tour Company with id %s not found", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Tour Company with id %s not found", id)));
         tourCompany = new TourCompany(id, tourCompany.name(), TourCompanyStatus.APPROVED.name());
         var updatedTourCompany = tourCompanyRepository.save(tourCompany);
         createTourCompanyWallet(updatedTourCompany);

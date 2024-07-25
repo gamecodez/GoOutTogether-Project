@@ -26,7 +26,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 import dev.nncode.gooutbackend.common.enumeration.TourCompanyStatus;
 import dev.nncode.gooutbackend.common.enumeration.TourStatus;
-import dev.nncode.gooutbackend.common.exception.EntityNotFound;
+import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.tour.dto.TourDto;
 import dev.nncode.gooutbackend.tour.model.Tour;
 import dev.nncode.gooutbackend.tour.model.TourCount;
@@ -36,7 +36,7 @@ import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class TourServiceTest {
+class TourServiceTest {
 
     @InjectMocks
     private TourServiceImpl tourService;
@@ -109,8 +109,8 @@ public class TourServiceTest {
                 TourStatus.PENDING.name());
 
         when(tourCompanyRepository.findById(any()))
-                .thenThrow(new EntityNotFound(String.format("Tour Company with id %s not found", 1)));
-        assertThrows(EntityNotFound.class, () -> tourService.createTour(payload));
+                .thenThrow(new EntityNotFoundException(String.format("Tour Company with id %s not found", 1)));
+        assertThrows(EntityNotFoundException.class, () -> tourService.createTour(payload));
     }
 
     @Test
@@ -144,8 +144,8 @@ public class TourServiceTest {
     @Test
     void whenGetTourByIdNotFoundThenReturnNotFound() {
         when(tourRepository.findById(anyInt()))
-                .thenThrow(new EntityNotFound(String.format("Tour with id %s not found", 1)));
-        assertThrows(EntityNotFound.class, () -> tourService.getTourById(1));
+                .thenThrow(new EntityNotFoundException(String.format("Tour with id %s not found", 1)));
+        assertThrows(EntityNotFoundException.class, () -> tourService.getTourById(1));
     }
 
     @Test

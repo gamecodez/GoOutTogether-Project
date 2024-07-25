@@ -19,7 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.nncode.gooutbackend.common.enumeration.TourCompanyStatus;
-import dev.nncode.gooutbackend.common.exception.EntityNotFound;
+import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.tourcompany.dto.RegisterTourCompanyDto;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 
@@ -89,7 +89,7 @@ class TourCompanyControllerTest {
         void whenApproveTourButCompanyNotFoundThenReturn404() throws Exception {
 
                 when(tourCompanyService.approvedTourCompany(anyInt()))
-                                .thenThrow(new EntityNotFound());
+                                .thenThrow(new EntityNotFoundException());
 
                 mockMvc.perform(post(String.format("/api/v1/tour-companies/%d/approve", 1)))
                                 .andExpect(status().isNotFound());

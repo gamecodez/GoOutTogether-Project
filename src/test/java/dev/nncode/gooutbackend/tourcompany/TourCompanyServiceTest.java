@@ -20,14 +20,14 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import dev.nncode.gooutbackend.common.enumeration.TourCompanyStatus;
-import dev.nncode.gooutbackend.common.exception.EntityNotFound;
+import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.tourcompany.dto.RegisterTourCompanyDto;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompanyLogin;
-import dev.nncode.gooutbackend.tourcompany.model.TourCompanyWallet;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyLoginRepository;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyRepository;
-import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyWalletRepository;
+import dev.nncode.gooutbackend.wallet.model.TourCompanyWallet;
+import dev.nncode.gooutbackend.wallet.model.repository.TourCompanyWalletRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class TourCompanyServiceTest {
@@ -99,7 +99,7 @@ public class TourCompanyServiceTest {
     @Test
     void whenApprovedTourButTourCompanyNotFoundThenError() {
         when(tourCompanyRepository.findById(anyInt()))
-                .thenThrow(new EntityNotFound(String.format("Tour Company with id %s not found", 1)));
-        assertThrows(EntityNotFound.class, () -> tourCompanyService.approvedTourCompany(1));
+                .thenThrow(new EntityNotFoundException(String.format("Tour Company with id %s not found", 1)));
+        assertThrows(EntityNotFoundException.class, () -> tourCompanyService.approvedTourCompany(1));
     }
 }

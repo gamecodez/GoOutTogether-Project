@@ -1,8 +1,11 @@
-package dev.nncode.gooutbackend.user;
+package dev.nncode.gooutbackend.user.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import dev.nncode.gooutbackend.user.model.Role;
+import dev.nncode.gooutbackend.user.repository.RoleRepository;
 
 @Service
 public class RoleService {

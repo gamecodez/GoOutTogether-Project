@@ -40,8 +40,7 @@ public class TourServiceImpl implements TourService {
     public Tour createTour(TourDto body) {
         var tourCompanyId = body.tourCompanyId();
         var tourcompany = tourCompanyRepository.findById(tourCompanyId)
-                .orElseThrow(
-                        () -> new EntityNotFoundException(String.format("Tour Company with id %s not found", tourCompanyId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Tour Company with id %s not found", tourCompanyId)));
         AggregateReference<TourCompany, Integer> tourCompanyReference = AggregateReference.to(tourcompany.id());
         var tour = new Tour(
                 null,

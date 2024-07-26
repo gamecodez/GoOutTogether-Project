@@ -18,7 +18,7 @@ import dev.nncode.gooutbackend.tourcompany.model.TourCompanyLogin;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyLoginRepository;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyRepository;
 import dev.nncode.gooutbackend.wallet.model.TourCompanyWallet;
-import dev.nncode.gooutbackend.wallet.model.repository.TourCompanyWalletRepository;
+import dev.nncode.gooutbackend.wallet.repository.TourCompanyWalletRepository;
 
 @Service
 public class TourCompanyServiceImpl implements TourCompanyService {
@@ -30,7 +30,7 @@ public class TourCompanyServiceImpl implements TourCompanyService {
     private final TourCompanyWalletRepository tourCompanyWalletRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public TourCompanyServiceImpl(TourCompanyRepository tourCompanyRepository, TourCompanyLoginRepository tourCompanyLoginRepository, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder, dev.nncode.gooutbackend.wallet.model.repository.TourCompanyWalletRepository tourCompanyWalletRepository) {
+    public TourCompanyServiceImpl(TourCompanyRepository tourCompanyRepository, TourCompanyLoginRepository tourCompanyLoginRepository, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder, dev.nncode.gooutbackend.wallet.repository.TourCompanyWalletRepository tourCompanyWalletRepository) {
         this.tourCompanyRepository = tourCompanyRepository;
         this.tourCompanyLoginRepository = tourCompanyLoginRepository;
         this.passwordEncoder = passwordEncoder;

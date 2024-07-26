@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.user.model.User;
 import dev.nncode.gooutbackend.wallet.model.UserWallet;
-import dev.nncode.gooutbackend.wallet.model.repository.UserWalletRepository;
+import dev.nncode.gooutbackend.wallet.repository.UserWalletRepository;
 
 @Service
 public class WalletServiceImpl implements WalletService {

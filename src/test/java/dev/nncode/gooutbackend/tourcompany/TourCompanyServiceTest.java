@@ -27,10 +27,10 @@ import dev.nncode.gooutbackend.tourcompany.model.TourCompanyLogin;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyLoginRepository;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyRepository;
 import dev.nncode.gooutbackend.wallet.model.TourCompanyWallet;
-import dev.nncode.gooutbackend.wallet.model.repository.TourCompanyWalletRepository;
+import dev.nncode.gooutbackend.wallet.repository.TourCompanyWalletRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class TourCompanyServiceTest {
+class TourCompanyServiceTest {
 
     @InjectMocks
     private TourCompanyServiceImpl tourCompanyService;

@@ -1,4 +1,4 @@
-package dev.nncode.gooutbackend.wallet.model.repository;
+package dev.nncode.gooutbackend.wallet.repository;
 
 import org.springframework.data.repository.CrudRepository;
 

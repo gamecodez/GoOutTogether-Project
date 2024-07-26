@@ -8,7 +8,7 @@ import dev.nncode.gooutbackend.user.model.User;
 public interface UserService {
     User getUserById(int id);
 
-    UserInfoDto getUserInfoById(int id);
+    UserInfoDto getUserDtoById(int id);
 
     UserInfoDto createUser(UserCreationDto body);
 

@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfoDto getUserInfoById(int id) {
+    public UserInfoDto getUserDtoById(int id) {
         var user = getUserById(id);
         return new UserInfoDto(user.id(), user.firstName(), user.lastName(), user.phoneNumber());
     }
@@ -53,9 +53,10 @@ public class UserServiceImpl implements UserService {
         // 2. Create user
         var prepareUser = new User(null, body.firstName(), body.lastName(), body.phoneNumber());
         var newUser = userRepository.save(prepareUser);
-        // 3. Create credential
+        // 3. Binding role
+        // 4. Create credential
         var userCredential = authService.createConsumerCredential(newUser.id(), body.email(), body.password());
-        // 4. Create wallet for user
+        // 5. Create wallet for user
         walletService.createConsumerWallet(newUser.id());
         return new UserInfoDto(newUser.id(), newUser.firstName(), newUser.lastName(), newUser.phoneNumber());
     }

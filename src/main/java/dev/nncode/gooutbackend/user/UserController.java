@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +34,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserInfoDto> getUserById(@PathVariable Integer id) {
-        var result = userService.getUserInfoById(id);
+        var result = userService.getUserDtoById(id);
         return ResponseEntity.ok(result);
 
     }
@@ -46,7 +47,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<UserInfoDto> updateUser(@PathVariable Integer id,
             @RequestBody @Validated UserUpdateDto body) {
         var result = userService.updateUser(id, body);

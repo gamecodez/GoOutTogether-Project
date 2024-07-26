@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import dev.nncode.gooutbackend.auth.AuthService;
+import dev.nncode.gooutbackend.common.enumeration.RoleEnum;
 import dev.nncode.gooutbackend.common.exception.CredentialExistsException;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.user.dto.UserCreationDto;
@@ -21,12 +23,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final WalletService walletService;
+    private final RoleService roleService;
     private final AuthService authService;
 
-    public UserServiceImpl(AuthService authService, UserRepository userRepository, WalletService walletService) {
+    public UserServiceImpl(AuthService authService, UserRepository userRepository, WalletService walletService, RoleService roleService) {
         this.authService = authService;
         this.userRepository = userRepository;
         this.walletService = walletService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -54,6 +58,7 @@ public class UserServiceImpl implements UserService {
         var prepareUser = new User(null, body.firstName(), body.lastName(), body.phoneNumber());
         var newUser = userRepository.save(prepareUser);
         // 3. Binding role
+        var userRole = roleService.bindingNewUser(newUser.id(), RoleEnum.CONSUMER);
         // 4. Create credential
         var userCredential = authService.createConsumerCredential(newUser.id(), body.email(), body.password());
         // 5. Create wallet for user

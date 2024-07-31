@@ -17,8 +17,8 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
-import dev.nncode.gooutbackend.auth.AuthService;
-import dev.nncode.gooutbackend.auth.UserLogin;
+import dev.nncode.gooutbackend.auth.model.UserLogin;
+import dev.nncode.gooutbackend.auth.service.AuthService;
 import dev.nncode.gooutbackend.common.exception.CredentialExistsException;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.user.dto.UserCreationDto;

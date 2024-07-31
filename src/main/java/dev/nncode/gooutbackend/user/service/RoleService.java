@@ -20,7 +20,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
 
-    public RoleService(RoleRepository roleRepository, dev.nncode.gooutbackend.user.repository.UserRoleRepository userRoleRepository) {
+    public RoleService(RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
     }

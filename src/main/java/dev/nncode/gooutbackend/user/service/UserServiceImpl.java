@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import dev.nncode.gooutbackend.auth.AuthService;
+import dev.nncode.gooutbackend.auth.service.AuthService;
 import dev.nncode.gooutbackend.common.enumeration.RoleEnum;
 import dev.nncode.gooutbackend.common.exception.CredentialExistsException;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;

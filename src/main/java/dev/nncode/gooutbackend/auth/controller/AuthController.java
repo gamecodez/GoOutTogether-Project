@@ -1,5 +1,8 @@
 package dev.nncode.gooutbackend.auth.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.nncode.gooutbackend.auth.dto.LoginRequestDto;
 import dev.nncode.gooutbackend.auth.dto.LoginResponseDto;
+import dev.nncode.gooutbackend.auth.dto.LogoutDto;
 import dev.nncode.gooutbackend.auth.service.AuthService;
 
 @RestController
@@ -16,12 +20,19 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(dev.nncode.gooutbackend.auth.service.AuthService authService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
     @PostMapping("/login")
-    public LoginResponseDto login(@RequestBody @Validated LoginRequestDto body) {
-        return authService.login(body);
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Validated LoginRequestDto body) {
+        return ResponseEntity.ok(authService.login(body));
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(Authentication authentication) {
+        var jwt = (Jwt) authentication.getPrincipal();
+        var logoutDto = new LogoutDto(jwt.getClaimAsString("sub"), jwt.getClaimAsString("roles"));
+        authService.logout(logoutDto);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -23,7 +23,7 @@ configurations {
 
 dependencies {
 	implementation("io.opentelemetry:opentelemetry-api")
-    agent("io.opentelemetry.javaagent:opentelemetry-javaagent:2.6.0")
+    agent("io.opentelemetry.javaagent:opentelemetry-javaagent:2.5.0")
 	
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -31,6 +31,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	implementation 'commons-codec:commons-codec:1.9'
+
 
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'

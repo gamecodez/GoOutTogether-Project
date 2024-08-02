@@ -14,15 +14,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -33,6 +40,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import dev.nncode.gooutbackend.auth.model.RSAKeyProperties;
 import dev.nncode.gooutbackend.common.enumeration.RoleEnum;
 
 @Configuration
@@ -54,8 +62,29 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable);
+                .formLogin(AbstractHttpConfigurer::disable)
+                .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtConverter;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
+        daoProvider.setPasswordEncoder(passwordEncoder);
+        daoProvider.setUserDetailsService(userDetailsService);
+        return new ProviderManager(daoProvider);
     }
 
     @Bean
@@ -67,19 +96,16 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     public JwtEncoder jwtEncoder(RSAKeyProperties rsaInstance) {
-        JWK jwt = new RSAKey.Builder(rsaInstance.publicKey).privateKey(rsaInstance.privateKey).build();
+        JWK jwt = new RSAKey.Builder(rsaInstance.publicKey()).privateKey(rsaInstance.privateKey()).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwt));
         return new NimbusJwtEncoder(jwks);
     }
-
     @Bean
     public JwtDecoder jwtDecoder(RSAKeyProperties rsaInstance) {
-        return NimbusJwtDecoder.withPublicKey(rsaInstance.publicKey).build();
+        return NimbusJwtDecoder.withPublicKey(rsaInstance.publicKey()).build();
     }
-
     @Bean
     public RSAKeyProperties rsaInstance() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         Resource privateKeyPkcs8 = resourceLoader.getResource("classPath:private_key_pkcs8.pem");
@@ -99,6 +125,4 @@ public class SecurityConfig {
         RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
         return new RSAKeyProperties(pubKey, privKey);
     }
-
-    public static record RSAKeyProperties(RSAPublicKey publicKey, PrivateKey privateKey) {}
 }

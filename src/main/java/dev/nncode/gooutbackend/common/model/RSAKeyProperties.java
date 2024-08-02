@@ -1,4 +1,4 @@
-package dev.nncode.gooutbackend.auth.model;
+package dev.nncode.gooutbackend.common.model;
 
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;

@@ -40,8 +40,8 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
-import dev.nncode.gooutbackend.auth.model.RSAKeyProperties;
 import dev.nncode.gooutbackend.common.enumeration.RoleEnum;
+import dev.nncode.gooutbackend.common.model.RSAKeyProperties;
 
 @Configuration
 @EnableWebSecurity

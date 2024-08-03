@@ -17,13 +17,16 @@ import dev.nncode.gooutbackend.auth.dto.AuthenticatedUser;
 import dev.nncode.gooutbackend.auth.dto.LoginRequestDto;
 import dev.nncode.gooutbackend.auth.dto.LoginResponseDto;
 import dev.nncode.gooutbackend.auth.dto.LogoutDto;
+import dev.nncode.gooutbackend.auth.dto.RefreshTokenDto;
 import dev.nncode.gooutbackend.auth.model.RefreshToken;
 import dev.nncode.gooutbackend.auth.model.UserLogin;
 import dev.nncode.gooutbackend.auth.repository.RefreshTokenRepository;
 import dev.nncode.gooutbackend.auth.repository.UserLoginRepository;
 import static dev.nncode.gooutbackend.common.Constants.TOKEN_TYPE;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
+import dev.nncode.gooutbackend.common.exception.RefreshTokenExpiredException;
 import dev.nncode.gooutbackend.user.model.User;
+import dev.nncode.gooutbackend.user.repository.UserRepository;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -34,15 +37,19 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
-    public AuthServiceImpl(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
-            TokenService tokenService, UserLoginRepository userLoginRepository,
-            RefreshTokenRepository refreshTokenRepository) {
+    public AuthServiceImpl(AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder, TokenService tokenService,
+            UserLoginRepository userLoginRepository,
+            RefreshTokenRepository refreshTokenRepository,
+            UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
         this.userLoginRepository = userLoginRepository;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -84,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
 
         var now = Instant.now();
         var accessToken = tokenService.issueAccessToken(authentication, now);
-        var refreshToken = tokenService.issueRefreshToken(authentication, now);
+        var refreshToken = tokenService.issueRefreshToken();
 
         logout(authentication);
 
@@ -126,5 +133,53 @@ public class AuthServiceImpl implements AuthService {
                 logoutDto.roles(),
                 Integer.parseInt((logoutDto.sub())),
                 true);
+    }
+
+    @Override
+    public LoginResponseDto issueNewAccessToken(RefreshTokenDto body) {
+        // Check refresh token is exists?
+        var refreshTokenEntity = refreshTokenRepository.findOneByToken(body.refreshToken())
+                .orElseThrow(() -> new EntityNotFoundException("This refresh token not found"));
+        var userId = refreshTokenEntity.resourceId();
+        // Expired? - DB -> IssuedDate + configured expire time
+        if (tokenService.isRefreshTokenExpired(refreshTokenEntity)) {
+            logout(new LogoutDto(String.valueOf(userId), refreshTokenEntity.usage()));
+            // Need re-login
+            throw new RefreshTokenExpiredException("This refresh token is expired");
+        }
+        // Token almost expired => refresh token rotation
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User Id: %d not found", userId)));
+        var credential = findCredentialByUserId(user.id())
+                .orElseThrow(
+                        () -> new EntityNotFoundException(
+                                String.format("Credential for user Id: %d not found", user.id())));
+        var newAccessToken = tokenService.issueAccessToken(credential, Instant.now());
+        var refreshToken = tokenService.rotateRefreshTokenIfNeed(refreshTokenEntity);
+        // Check if refresh token change -> change old refresh token to expired
+        if (!refreshToken.equals(refreshTokenEntity.token())) {
+            var updatedRefreshTokenEntity = new RefreshToken(
+                    refreshTokenEntity.id(),
+                    refreshTokenEntity.token(),
+                    refreshTokenEntity.issuedDate(),
+                    refreshTokenEntity.usage(),
+                    refreshTokenEntity.resourceId(),
+                    true);
+            refreshTokenRepository.save(updatedRefreshTokenEntity);
+            var prepareRefreshTokenModel = new RefreshToken(
+                    null,
+                    refreshToken,
+                    Instant.now(),
+                    refreshTokenEntity.usage(),
+                    refreshTokenEntity.resourceId(),
+                    false);
+            refreshTokenRepository.save(prepareRefreshTokenModel);
+        }
+        return new LoginResponseDto(
+                refreshTokenEntity.resourceId(),
+                TOKEN_TYPE,
+                newAccessToken,
+                refreshToken);
     }
 }

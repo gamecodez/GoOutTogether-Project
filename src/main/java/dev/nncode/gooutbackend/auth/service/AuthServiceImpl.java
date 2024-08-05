@@ -136,6 +136,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public LoginResponseDto issueNewAccessToken(RefreshTokenDto body) {
         // Check refresh token is exists?
         var refreshTokenEntity = refreshTokenRepository.findOneByToken(body.refreshToken())

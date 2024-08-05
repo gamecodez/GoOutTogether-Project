@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.nncode.gooutbackend.auth.dto.LoginRequestDto;
 import dev.nncode.gooutbackend.auth.dto.LoginResponseDto;
 import dev.nncode.gooutbackend.auth.dto.LogoutDto;
+import dev.nncode.gooutbackend.auth.dto.RefreshTokenDto;
 import dev.nncode.gooutbackend.auth.service.AuthService;
 
 @RestController
@@ -27,6 +28,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Validated LoginRequestDto body) {
         return ResponseEntity.ok(authService.login(body));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDto> refreshToken(@RequestBody @Validated RefreshTokenDto body) {
+        return ResponseEntity.ok(authService.issueNewAccessToken(body));
     }
     @PostMapping("/logout")
     public ResponseEntity<?> logout(Authentication authentication) {

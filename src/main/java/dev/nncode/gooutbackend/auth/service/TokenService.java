@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import dev.nncode.gooutbackend.auth.dto.AuthenticatedUser;
 import dev.nncode.gooutbackend.auth.model.RefreshToken;
 import dev.nncode.gooutbackend.auth.model.UserLogin;
+import dev.nncode.gooutbackend.tourcompany.model.TourCompanyLogin;
 
 @Service
 public class TokenService {
@@ -48,6 +49,13 @@ public class TokenService {
                 .loadUserByUsername(userLogin.email());
         return generateToken(userDetails, issuedDate, accessTokenExpiredInSeconds);
     }
+
+    public String issueAccessToken(TourCompanyLogin tourCompanyLogin, Instant issuedDate) {
+        AuthenticatedUser userDetails = (AuthenticatedUser) customUserDetailsService
+                .loadUserByUsername(tourCompanyLogin.username());
+        return generateToken(userDetails, issuedDate, accessTokenExpiredInSeconds);
+    }
+
 
     public String issueRefreshToken() {
         return UUID.randomUUID().toString();

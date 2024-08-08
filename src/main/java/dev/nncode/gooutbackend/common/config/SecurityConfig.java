@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -57,11 +58,26 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        // Actuator
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/metrics").permitAll()
+                        // Auth
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/refresh").permitAll()
-                        .requestMatchers("/api/v1/auth/logout").hasAnyRole(RoleEnum.ADMIN.name(), RoleEnum.CONSUMER.name())
+                        // Tour Company
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tour-company").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tour-company/{id:\\d+}").hasRole(RoleEnum.ADMIN.name())
+                        // Tour
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tours").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tours/{id:\\d+}").permitAll()
+                        // User
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                        .requestMatchers("/api/v1/users/**").hasRole(RoleEnum.ADMIN.name())
+                        // User self-managed (only for self-managed user)
+                        .requestMatchers("/api/v1/me").hasRole(RoleEnum.CONSUMER.name())
+                        // Administrrator purpose
                         .requestMatchers("/api/v1/admin/**").hasRole(RoleEnum.ADMIN.name())
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -99,16 +115,19 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public JwtEncoder jwtEncoder(RSAKeyProperties rsaInstance) {
         JWK jwt = new RSAKey.Builder(rsaInstance.publicKey()).privateKey(rsaInstance.privateKey()).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwt));
         return new NimbusJwtEncoder(jwks);
     }
+
     @Bean
     public JwtDecoder jwtDecoder(RSAKeyProperties rsaInstance) {
         return NimbusJwtDecoder.withPublicKey(rsaInstance.publicKey()).build();
     }
+
     @Bean
     public RSAKeyProperties rsaInstance() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         Resource privateKeyPkcs8 = resourceLoader.getResource("classPath:private_key_pkcs8.pem");

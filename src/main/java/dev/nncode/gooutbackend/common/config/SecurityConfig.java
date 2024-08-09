@@ -77,6 +77,9 @@ public class SecurityConfig {
                         // User
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .requestMatchers("/api/v1/users/**").hasRole(RoleEnum.ADMIN.name())
+                        // Wallet
+                        .requestMatchers(HttpMethod.GET, "/api/v1/wallets/me").hasRole(RoleEnum.CONSUMER.name())
+                        .requestMatchers(HttpMethod.POST,"/api/v1/wallets/topup").hasRole(RoleEnum.CONSUMER.name())
                         // User self-managed (only for self-managed user)
                         .requestMatchers("/api/v1/me").hasRole(RoleEnum.CONSUMER.name())
                         // Administrrator purpose

@@ -23,13 +23,11 @@ import dev.nncode.gooutbackend.auth.model.UserLogin;
 import dev.nncode.gooutbackend.auth.repository.RefreshTokenRepository;
 import dev.nncode.gooutbackend.auth.repository.UserLoginRepository;
 import static dev.nncode.gooutbackend.common.Constants.TOKEN_TYPE;
-
 import dev.nncode.gooutbackend.common.enumeration.RoleEnum;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.common.exception.RefreshTokenExpiredException;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyLoginRepository;
-import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyRepository;
 import dev.nncode.gooutbackend.user.model.User;
 import dev.nncode.gooutbackend.user.repository.UserRepository;
 
@@ -45,13 +43,11 @@ public class AuthServiceImpl implements AuthService {
         private final RefreshTokenRepository refreshTokenRepository;
         private final UserRepository userRepository;
         private final TourCompanyLoginRepository tourCompanyLoginRepository;
-        private final TourCompanyRepository tourCompanyRepository;
 
         public AuthServiceImpl(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
                         TokenService tokenService, UserLoginRepository userLoginRepository,
                         RefreshTokenRepository refreshTokenRepository, UserRepository userRepository,
-                        TourCompanyLoginRepository tourCompanyLoginRepository,
-                        TourCompanyRepository tourCompanyRepository) {
+                        TourCompanyLoginRepository tourCompanyLoginRepository) {
                 this.authenticationManager = authenticationManager;
                 this.passwordEncoder = passwordEncoder;
                 this.tokenService = tokenService;
@@ -59,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
                 this.refreshTokenRepository = refreshTokenRepository;
                 this.userRepository = userRepository;
                 this.tourCompanyLoginRepository = tourCompanyLoginRepository;
-                this.tourCompanyRepository = tourCompanyRepository;
+
         }
 
         @Override

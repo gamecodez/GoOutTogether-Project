@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import dev.nncode.gooutbackend.auth.dto.AuthenticatedUser;
 import dev.nncode.gooutbackend.auth.model.RefreshToken;
 import dev.nncode.gooutbackend.auth.model.UserLogin;
+import dev.nncode.gooutbackend.auth.repository.RefreshTokenRepository;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompanyLogin;
 
 @Service
@@ -29,21 +30,25 @@ public class TokenService {
     private final long accessTokenExpiredInSeconds;
     private final long refreshTokenExpiredInSeconds;
     private final CustomUserDetailsService customUserDetailsService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public TokenService(
             JwtEncoder jwtEncoder,
             @Value(value = "${token.access-token-expired-in-seconds}") long accessTokenExpiredInSeconds,
             @Value(value = "${token.refresh-token-expired-in-seconds}") long refreshTokenExpiredInSeconds,
-            CustomUserDetailsService customUserDetailsService) {
+            CustomUserDetailsService customUserDetailsService,
+            RefreshTokenRepository refreshTokenRepository) {
         this.jwtEncoder = jwtEncoder;
         this.accessTokenExpiredInSeconds = accessTokenExpiredInSeconds;
         this.refreshTokenExpiredInSeconds = refreshTokenExpiredInSeconds;
         this.customUserDetailsService = customUserDetailsService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public String issueAccessToken(Authentication auth, Instant issueDate) {
         return generateToken(auth, issueDate, accessTokenExpiredInSeconds);
     }
+
     public String issueAccessToken(UserLogin userLogin, Instant issuedDate) {
         AuthenticatedUser userDetails = (AuthenticatedUser) customUserDetailsService
                 .loadUserByUsername(userLogin.email());
@@ -56,7 +61,6 @@ public class TokenService {
         return generateToken(userDetails, issuedDate, accessTokenExpiredInSeconds);
     }
 
-
     public String issueRefreshToken() {
         return UUID.randomUUID().toString();
     }
@@ -67,9 +71,11 @@ public class TokenService {
 
     public String generateToken(Authentication auth, Instant issueDate, long expiredInSeconds) {
         var authenticatedUser = (AuthenticatedUser) auth.getPrincipal();
-        return generateToken(authenticatedUser.userId(), authenticatedUser.getAuthorities(), issueDate, expiredInSeconds);
+        return generateToken(authenticatedUser.userId(), authenticatedUser.getAuthorities(), issueDate,
+                expiredInSeconds);
 
     }
+
     private String generateToken(Integer userId,
             Collection<? extends GrantedAuthority> authorities,
             Instant issuedDate,
@@ -111,5 +117,11 @@ public class TokenService {
             return issueRefreshToken();
         }
         return refreshTokenEntity.token();
+    }
+
+    public void cleanupRefreshTokenThatNotExpired() {
+        var now = Instant.now();
+        var thresholdDate = now.minusSeconds(refreshTokenExpiredInSeconds);
+        refreshTokenRepository.updateRefreshTokenThatExpired(true, thresholdDate);
     }
 }

@@ -32,6 +32,7 @@ import dev.nncode.gooutbackend.common.enumeration.TourStatus;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
 import dev.nncode.gooutbackend.tour.dto.TourDto;
 import dev.nncode.gooutbackend.tour.model.Tour;
+import dev.nncode.gooutbackend.tour.service.TourService;
 
 @WebMvcTest(TourController.class)
 class TourControllerTest {

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.nncode.gooutbackend.tour.dto.TourDto;
 import dev.nncode.gooutbackend.tour.model.Tour;
+import dev.nncode.gooutbackend.tour.service.TourService;
 
 @RestController
 @RequestMapping("api/v1/tours")
@@ -29,7 +30,7 @@ public class TourController {
 
     private final TourService tourService;
 
-    public TourController(dev.nncode.gooutbackend.tour.TourService tourService) {
+    public TourController(dev.nncode.gooutbackend.tour.service.TourService tourService) {
         this.tourService = tourService;
     }
 

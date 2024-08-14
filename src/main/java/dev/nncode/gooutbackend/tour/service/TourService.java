@@ -1,4 +1,4 @@
-package dev.nncode.gooutbackend.tour;
+package dev.nncode.gooutbackend.tour.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,5 +13,4 @@ public interface TourService {
     Tour getTourById(int id);
 
     Page<Tour> getPageTour(Pageable pageable);
-
 }

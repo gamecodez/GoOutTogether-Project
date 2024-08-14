@@ -6,17 +6,23 @@ import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import dev.nncode.gooutbackend.booking.model.Booking;
 import dev.nncode.gooutbackend.common.enumeration.TransactionType;
 import dev.nncode.gooutbackend.common.exception.EntityNotFoundException;
+import dev.nncode.gooutbackend.payment.Transaction;
+import dev.nncode.gooutbackend.payment.TransactionRepository;
+import dev.nncode.gooutbackend.payment.TransactionUtil;
+import dev.nncode.gooutbackend.tour.repository.TourRepository;
 import dev.nncode.gooutbackend.user.model.User;
 import dev.nncode.gooutbackend.wallet.dto.TopupDto;
 import dev.nncode.gooutbackend.wallet.dto.UserWalletInfoDto;
-import dev.nncode.gooutbackend.wallet.model.Transaction;
+import dev.nncode.gooutbackend.wallet.model.TourCompanyWallet;
 import dev.nncode.gooutbackend.wallet.model.UserWallet;
-import dev.nncode.gooutbackend.wallet.repository.TransactionRepository;
+import dev.nncode.gooutbackend.wallet.repository.TourCompanyWalletRepository;
 import dev.nncode.gooutbackend.wallet.repository.UserWalletRepository;
 
 @Service
@@ -26,10 +32,15 @@ public class WalletServiceImpl implements WalletService {
 
     private final UserWalletRepository userWalletRepository;
     private final TransactionRepository transactionRepository;
+    private final TourCompanyWalletRepository tourCompanyWalletRepository;
+    private final TourRepository tourRepository;
 
-    public WalletServiceImpl(UserWalletRepository userWalletRepository, TransactionRepository transactionRepository) {
+    public WalletServiceImpl(UserWalletRepository userWalletRepository, TransactionRepository transactionRepository,
+            TourCompanyWalletRepository tourCompanyWalletRepository, TourRepository tourRepository) {
         this.userWalletRepository = userWalletRepository;
         this.transactionRepository = transactionRepository;
+        this.tourCompanyWalletRepository = tourCompanyWalletRepository;
+        this.tourRepository = tourRepository;
     }
 
     @Override
@@ -54,12 +65,6 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public UserWalletInfoDto getOwnWallet(int userId) {
-        var userWallet = getWalletByUserId(userId);
-        return new UserWalletInfoDto(userId, userWallet.balance());
-    }
-
-    @Override
     @Transactional
     public UserWalletInfoDto topup(TopupDto body) {
         var now = Instant.now();
@@ -70,12 +75,18 @@ public class WalletServiceImpl implements WalletService {
         if (optionalHistoricalTranaction.isPresent()) {
             return new UserWalletInfoDto(userWallet.userId().getId(), userWallet.balance());
         }
-        var newTransaction = generateTopupTransaction(idempotentKey, userId, now, body.amount());
+        var newTransaction = TransactionUtil.generateTopupTransaction(idempotentKey, userId, now, body.amount());
         transactionRepository.save(newTransaction);
         var updatedBalance = userWallet.balance().add(body.amount());
         var updatedTopupBalance = new UserWallet(userWallet.id(), userWallet.userId(), now, updatedBalance);
         var updatedWallet = userWalletRepository.save(updatedTopupBalance);
         return new UserWalletInfoDto(updatedWallet.userId().getId(), updatedWallet.balance());
+    }
+
+    @Override
+    public UserWalletInfoDto getOwnWallet(int userId) {
+        var userWallet = getWalletByUserId(userId);
+        return new UserWalletInfoDto(userId, userWallet.balance());
     }
 
     private UserWallet getWalletByUserId(int userId) {
@@ -85,8 +96,58 @@ public class WalletServiceImpl implements WalletService {
                         String.format("Wallet for userId: %d not found", userId)));
     }
 
-    private Transaction generateTopupTransaction(String idempotentKey, int userId, Instant timestamp, BigDecimal amount) {
-    
-        return new Transaction(null, AggregateReference.to(userId), null, Instant.now(), amount, TransactionType.TOPUP.name(), idempotentKey);
+    @Override
+    public Pair<UserWallet, TourCompanyWallet> getUserWalletAndTourCompanyWallet(Booking bookingData) {
+
+        var userId = bookingData.userId();
+        var tourId = bookingData.tourId();
+        var userWallet = userWalletRepository.findOneByUserId(userId)
+                .orElseThrow(EntityNotFoundException::new);
+        var tourInfo = tourRepository.findById(tourId.getId())
+                .orElseThrow(EntityNotFoundException::new);
+        var tourCompanyWallet = tourCompanyWalletRepository.findOneByTourCompanyId(tourInfo.tourCompanyId())
+                .orElseThrow(EntityNotFoundException::new);
+        return Pair.of(userWallet, tourCompanyWallet);
+    }
+
+    @Override
+    @Transactional
+    public Pair<UserWallet, TourCompanyWallet> transfer(UserWallet userWallet, TourCompanyWallet tourCompanyWallet,
+            BigDecimal amount, TransactionType type) {
+        return switch (type) {
+            case TransactionType.BOOKING -> {
+                var prepareUserWallet = new UserWallet(
+                        userWallet.id(),
+                        userWallet.userId(),
+                        Instant.now(),
+                        userWallet.balance().subtract(amount));
+                var prepareTourCompanyWallet = new TourCompanyWallet(
+                        tourCompanyWallet.id(),
+                        tourCompanyWallet.tourCompanyId(),
+                        Instant.now(),
+                        tourCompanyWallet.balance().add(amount));
+                var updateUserWallet = userWalletRepository.save(prepareUserWallet);
+                var updateTourCompanyWallet = tourCompanyWalletRepository.save(prepareTourCompanyWallet);
+                yield Pair.of(updateUserWallet, updateTourCompanyWallet);
+            }
+            case TransactionType.REFUND -> {
+                var prepareUserWallet = new UserWallet(
+                        userWallet.id(),
+                        userWallet.userId(),
+                        Instant.now(),
+                        userWallet.balance().add(amount));
+                var prepareTourCompanyWallet = new TourCompanyWallet(
+                        tourCompanyWallet.id(),
+                        tourCompanyWallet.tourCompanyId(),
+                        Instant.now(),
+                        tourCompanyWallet.balance().subtract(amount));
+                var updateUserWallet = userWalletRepository.save(prepareUserWallet);
+                var updateTourCompanyWallet = tourCompanyWalletRepository.save(prepareTourCompanyWallet);
+                yield Pair.of(updateUserWallet, updateTourCompanyWallet);
+            }
+            default -> {
+                throw new IllegalStateException("Invalid Transaction Type");
+            }
+        };
     }
 }

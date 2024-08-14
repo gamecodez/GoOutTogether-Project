@@ -32,6 +32,7 @@ import dev.nncode.gooutbackend.tour.model.Tour;
 import dev.nncode.gooutbackend.tour.model.TourCount;
 import dev.nncode.gooutbackend.tour.repository.TourCountRepository;
 import dev.nncode.gooutbackend.tour.repository.TourRepository;
+import dev.nncode.gooutbackend.tour.service.TourServiceImpl;
 import dev.nncode.gooutbackend.tourcompany.model.TourCompany;
 import dev.nncode.gooutbackend.tourcompany.repository.TourCompanyRepository;
 

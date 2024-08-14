@@ -1,4 +1,4 @@
-package dev.nncode.gooutbackend.wallet.model;
+package dev.nncode.gooutbackend.payment;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -12,12 +12,12 @@ import dev.nncode.gooutbackend.user.model.User;
 
 @Table("transaction")
 public record Transaction(
-        @Id Integer id,
-        AggregateReference<User, Integer> userId,
-        AggregateReference<TourCompany, Integer> tourCompanyId,
-        Instant transactionDate,
-        BigDecimal amount,
-        String type,
-        String idempotentKey) {
-
+                @Id Integer id,
+                AggregateReference<User, Integer> userId,
+                AggregateReference<TourCompany, Integer> tourCompanyId,
+                Instant transactionDate,
+                BigDecimal amount,
+                String type,
+                String idempotentKey,
+                Integer bookingId) {
 }

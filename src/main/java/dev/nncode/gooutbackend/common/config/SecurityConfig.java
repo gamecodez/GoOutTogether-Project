@@ -79,7 +79,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/**").hasRole(RoleEnum.ADMIN.name())
                         // Wallet
                         .requestMatchers(HttpMethod.GET, "/api/v1/wallets/me").hasRole(RoleEnum.CONSUMER.name())
-                        .requestMatchers(HttpMethod.POST,"/api/v1/wallets/topup").hasRole(RoleEnum.CONSUMER.name())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/wallets/topup").hasRole(RoleEnum.CONSUMER.name())
+                        // Payment
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/**").hasRole(RoleEnum.CONSUMER.name())
+                        // Booking
+                        .requestMatchers(HttpMethod.POST, "/api/v1/booking/**").hasRole(RoleEnum.CONSUMER.name())
                         // User self-managed (only for self-managed user)
                         .requestMatchers("/api/v1/me").hasRole(RoleEnum.CONSUMER.name())
                         // Administrrator purpose
@@ -137,7 +141,8 @@ public class SecurityConfig {
 
     @Bean
     public RSAKeyProperties rsaInstance() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-        // Resource privateKeyPkcs8 = resourceLoader.getResource("classPath:private_key_pkcs8.pem");
+        // Resource privateKeyPkcs8 =
+        // resourceLoader.getResource("classPath:private_key_pkcs8.pem");
         String privateKeyContent = new String(Base64.decodeBase64(privateKeyBase64));
         // Resource publicKey = resourceLoader.getResource("classPath:public_key.pem");
         String publicKeyContent = new String(Base64.decodeBase64(publicKeyBase64));

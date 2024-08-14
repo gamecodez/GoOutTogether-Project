@@ -39,6 +39,7 @@ out/
 ### App log ###
 logs/
 
+.env
 private_key_pkcs8.pem
 private_key.pem
 public_key.pem
